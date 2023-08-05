@@ -1,0 +1,57 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer
+
+  Created: Tue Jul 25 15:44:56 GMT-06:00 2023
+  Author:  AA1382067021
+  Type: BPEL 2.0 Process
+  Purpose: Empty BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="ccBPEL"
+               targetNamespace="http://xmlns.oracle.com/ccTestApp/ccTestPro/ccBPEL"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/ccTestApp/ccTestPro/ccBPEL"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+               xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/ccTestApp/ccTestPro/ccRest"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:ess="http://xmlns.oracle.com/scheduler" xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap" xmlns:ns2="http://www.example.org">
+
+  <!--
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC
+     Set of activities coordinating the flow of messages across the
+     services integrated within this business process
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <partnerLinks>
+    <partnerLink name="ccRest" partnerLinkType="ns1:ccRest" myRole="ccRestProvider"/>
+  </partnerLinks>
+  <variables>
+    <variable name="ReceiveStr_ccOperation_InputVariable" messageType="ns1:ccOperation_inputMessage"/>
+    <variable name="Reply1_ccOperation_OutputVariable" messageType="ns1:ccOperation_outputMessage"/>
+  </variables>
+  <sequence name="main">
+    <receive name="ReceiveStr" createInstance="yes" partnerLink="ccRest" portType="ns1:ccRest_ptt"
+             operation="ccOperation" variable="ReceiveStr_ccOperation_InputVariable"/>
+    <assign name="Assign">
+      <copy>
+        <from>xp20:upper-case($ReceiveStr_ccOperation_InputVariable.request/ns2:inputStr)</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$Reply1_ccOperation_OutputVariable.reply/ns2:outputStr</to>
+      </copy>
+    </assign>
+    <reply name="ReplyRest" partnerLink="ccRest" variable="Reply1_ccOperation_OutputVariable"
+           portType="ns1:ccRest_ptt" operation="ccOperation"/>
+  </sequence>
+</process>
